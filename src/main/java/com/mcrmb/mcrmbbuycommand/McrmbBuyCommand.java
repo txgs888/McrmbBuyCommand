@@ -14,6 +14,8 @@ public final class McrmbBuyCommand extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+        reloadConfig();
         Plugin plugin = Bukkit.getPluginManager().getPlugin("Mcrmb");
         int version = Integer.parseInt(plugin.getDescription().getVersion().replace(".", ""));
         if (version < 109) {//如果为1.0.8或更老版本的Mcrmb,就以非静态方法调用
