@@ -1,0 +1,5 @@
+notPermission: '§c你没有执行此命令的权限'
+
+success: '§2购买成功.'
+
+failed: '§c购买失败,余额不足'

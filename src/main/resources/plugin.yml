@@ -1,0 +1,9 @@
+name: McrmbBuyCommand
+version: ${project.version}
+main: com.mcrmb.mcrmbbuycommand.McrmbBuyCommand
+depend: [Mcrmb]
+authors: [txgs888]
+
+commands:
+  bbuy:
+    usage: /<command> <玩家> <价格> <缘由> <命令 用;分割>
