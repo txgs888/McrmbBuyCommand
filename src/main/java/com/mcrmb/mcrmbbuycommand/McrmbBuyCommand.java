@@ -42,7 +42,7 @@ public final class McrmbBuyCommand extends JavaPlugin {
                     synchronized (args[0]) {
                         StringBuilder commandBuilder = new StringBuilder();
                         for (int i = 3; i < args.length; i++) {
-                            commandBuilder.append(args[i]);
+                            commandBuilder.append(args[i]).append(" ");
                         }
                         String cmd = commandBuilder.toString().replace("{player}", player);
                         if (buy(player, price, reason)) {
