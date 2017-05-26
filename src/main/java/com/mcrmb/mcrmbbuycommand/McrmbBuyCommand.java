@@ -37,44 +37,54 @@ public final class McrmbBuyCommand extends JavaPlugin {
         String player = args[0];
         int price = Integer.parseInt(args[1]);
         String reason = args[2];
-        StringBuilder commandBuilder = new StringBuilder();
-        for (int i = 3; i < args.length; i++) {
-            commandBuilder.append(args[i]);
-        }
-        String cmd = commandBuilder.toString().replace("{player}", player);
-        if (buy(player, price, reason)) {
-            Player targetPlayer = Bukkit.getPlayer(player);
-            String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("success"));
-            if (commandBuilder.toString().startsWith("op:") && targetPlayer != null && targetPlayer.isOnline()) {//如果指定以OP身份执行
-                cmd = cmd.substring(3, cmd.length());
-                boolean hasOp = targetPlayer.isOp(); //玩家执行命令前是否是OP
-                try {
-                    targetPlayer.setOp(true);
-                    targetPlayer.chat("/" + cmd);
-                    if (!hasOp) {
-                        targetPlayer.setOp(false);//如果玩家执行命令前不是OP,就取消掉OP
+
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                    synchronized (args[0]) {
+                        StringBuilder commandBuilder = new StringBuilder();
+                        for (int i = 3; i < args.length; i++) {
+                            commandBuilder.append(args[i]);
+                        }
+                        String cmd = commandBuilder.toString().replace("{player}", player);
+                        if (buy(player, price, reason)) {
+                            Player targetPlayer = Bukkit.getPlayer(player);
+                            String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("success"));
+                            if (commandBuilder.toString().startsWith("op:") && targetPlayer != null && targetPlayer.isOnline()) {//如果指定以OP身份执行
+                                cmd = cmd.substring(3, cmd.length());
+                                boolean hasOp = targetPlayer.isOp(); //玩家执行命令前是否是OP
+                                try {
+                                    targetPlayer.setOp(true);
+                                    targetPlayer.chat("/" + cmd);
+                                    if (!hasOp) {
+                                        targetPlayer.setOp(false);//如果玩家执行命令前不是OP,就取消掉OP
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    if (!hasOp) {
+                                        targetPlayer.setOp(false); //防止执行时出错导致OP没有正常被取消
+                                    }
+                                }
+                                targetPlayer.sendMessage(message);
+                            } else {//否则以后台执行
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                                sender.sendMessage(message);
+                            }
+                            return;
+                        } else {
+                            Player targetPlayer = Bukkit.getPlayer(player);
+                            String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("failed"));
+                            if (targetPlayer != null && targetPlayer.isOnline()) {
+                                targetPlayer.sendMessage(message);
+                            } else {
+                                sender.sendMessage(message);
+                            }
+                            return;
+                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (!hasOp) {
-                        targetPlayer.setOp(false); //防止执行时出错导致OP没有正常被取消
-                    }
+
+
                 }
-                targetPlayer.sendMessage(message);
-            } else {//否则以后台执行
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-                sender.sendMessage(message);
-            }
-        } else {
-            Player targetPlayer = Bukkit.getPlayer(player);
-            String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("failed"));
-            if (targetPlayer != null && targetPlayer.isOnline()) {
-                targetPlayer.sendMessage(message);
-            } else {
-                sender.sendMessage(message);
-            }
-        }
-        return false;
+        );
+        return true;
     }
 
     public boolean buy(String player, int money, String reason) {
