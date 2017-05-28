@@ -44,9 +44,10 @@ public final class McrmbBuyCommand extends JavaPlugin {
                         for (int i = 3; i < args.length; i++) {
                             commandBuilder.append(args[i]).append(" ");
                         }
-                        for (String commandString : commandBuilder.toString().split(";")) {
-                            String cmd = commandString.replace("{player}", player);
-                            if (buy(player, price, reason)) {
+                        if (buy(player, price, reason)) {
+                            for (String commandString : commandBuilder.toString().split(";")) {
+                                String cmd = commandString.replace("{player}", player);
+                                getLogger().info("玩家 " + player + " 购买 " + reason + " 执行命令: /" + cmd);
                                 Player targetPlayer = Bukkit.getPlayer(player);
                                 String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("success"));
                                 if (commandString.startsWith("op:") && targetPlayer != null && targetPlayer.isOnline()) {//如果指定以OP身份执行
@@ -70,16 +71,17 @@ public final class McrmbBuyCommand extends JavaPlugin {
                                     sender.sendMessage(message);
                                 }
                                 return;
-                            } else {
-                                Player targetPlayer = Bukkit.getPlayer(player);
-                                String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("failed"));
-                                if (targetPlayer != null && targetPlayer.isOnline()) {
-                                    targetPlayer.sendMessage(message);
-                                } else {
-                                    sender.sendMessage(message);
-                                }
-                                return;
+
                             }
+                        } else {
+                            Player targetPlayer = Bukkit.getPlayer(player);
+                            String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("failed"));
+                            if (targetPlayer != null && targetPlayer.isOnline()) {
+                                targetPlayer.sendMessage(message);
+                            } else {
+                                sender.sendMessage(message);
+                            }
+                            return;
                         }
 
                     }
