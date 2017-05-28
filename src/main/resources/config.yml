@@ -1,4 +1,4 @@
-notPermission: '§c你没有执行此命令的权限'
+notPermission: '§c只有OP或后台才可以执行此命令'
 
 success: '§2购买成功.'
 
