@@ -27,7 +27,7 @@ public final class McrmbBuyCommand extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("mcrmbbuycommand.use")) {
+        if (!sender.isOp()) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfig().getString("notPermission")));
             return true;
         }
