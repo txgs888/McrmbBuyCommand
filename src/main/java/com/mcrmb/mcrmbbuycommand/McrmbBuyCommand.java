@@ -46,34 +46,36 @@ public final class McrmbBuyCommand extends JavaPlugin {
                                 commandBuilder.append(args[i]).append(" ");
                             }
                             if (buy(player, price, reason)) {
-                                for (String commandString : commandBuilder.toString().split(";")) {
-                                    String cmd = commandString.replace("{player}", player);
-                                    Player targetPlayer = Bukkit.getPlayer(player);
-                                    String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("success", "§2购买成功"));
-                                    if (commandString.startsWith("op:") && targetPlayer != null && targetPlayer.isOnline()) {//如果指定以OP身份执行
-                                        cmd = cmd.substring(3, cmd.length());
-                                        getLogger().info("玩家 " + player + " 购买 " + reason + " 以OP身份执行命令: /" + cmd);
-                                        boolean hasOp = targetPlayer.isOp(); //玩家执行命令前是否是OP
-                                        try {
-                                            targetPlayer.setOp(true);
-                                            targetPlayer.chat("/" + cmd);
-                                            if (!hasOp) {
-                                                targetPlayer.setOp(false);//如果玩家执行命令前不是OP,就取消掉OP
+                                Bukkit.getScheduler().runTask(McrmbBuyCommand.this, () -> {
+                                    for (String commandString : commandBuilder.toString().split(";")) {
+                                        String cmd = commandString.replace("{player}", player);
+                                        Player targetPlayer = Bukkit.getPlayer(player);
+                                        String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("success", "§2购买成功"));
+                                        if (commandString.startsWith("op:") && targetPlayer != null && targetPlayer.isOnline()) {//如果指定以OP身份执行
+                                            cmd = cmd.substring(3, cmd.length());
+                                            getLogger().info("玩家 " + player + " 购买 " + reason + " 以OP身份执行命令: /" + cmd);
+                                            boolean hasOp = targetPlayer.isOp(); //玩家执行命令前是否是OP
+                                            try {
+                                                targetPlayer.setOp(true);
+                                                targetPlayer.chat("/" + cmd);
+                                                if (!hasOp) {
+                                                    targetPlayer.setOp(false);//如果玩家执行命令前不是OP,就取消掉OP
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                                if (!hasOp) {
+                                                    targetPlayer.setOp(false); //防止执行时出错导致OP没有正常被取消
+                                                }
                                             }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            if (!hasOp) {
-                                                targetPlayer.setOp(false); //防止执行时出错导致OP没有正常被取消
-                                            }
+                                            targetPlayer.sendMessage(message);
+                                        } else {//否则以后台执行
+                                            getLogger().info("玩家 " + player + " 购买 " + reason + " 后台执行命令: /" + cmd + "  执行结果: " + Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd));
+                                            sender.sendMessage(message);
                                         }
-                                        targetPlayer.sendMessage(message);
-                                    } else {//否则以后台执行
-                                        getLogger().info("玩家 " + player + " 购买 " + reason + " 后台执行命令: /" + cmd + "  执行结果: " + Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd));
-                                        sender.sendMessage(message);
-                                    }
-                                    return;
+                                        return;
 
-                                }
+                                    }
+                                });
                             } else {
                                 Player targetPlayer = Bukkit.getPlayer(player);
                                 String message = ChatColor.translateAlternateColorCodes('&', getConfig().getString("failed", "§c购买失败,余额不足"));
