@@ -6,7 +6,7 @@
 
     <groupId>com.mcrmb</groupId>
     <artifactId>McrmbBuyCommand</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>jar</packaging>
 
     <name>McrmbBuyCommand</name>
