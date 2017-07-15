@@ -7,7 +7,6 @@
 
 
 /bbuy <玩家> <价格> <缘由> <命令 用;分割>
-使用上面命令的权限: mcrmbbuycommand.use   不要给玩家
 
 如果出现提示信息乱码请将plugins/McrmbBuyCommand/下的config.yml转为ANSI编码然后重载(由于我编译时用的是utf-8,所以在windows上面可能会乱码)
 
