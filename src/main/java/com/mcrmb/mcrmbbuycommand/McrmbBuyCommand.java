@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public final class McrmbBuyCommand extends JavaPlugin {
@@ -19,11 +20,17 @@ public final class McrmbBuyCommand extends JavaPlugin {
         Plugin plugin = Bukkit.getPluginManager().getPlugin("Mcrmb");
         int version = Integer.parseInt(plugin.getDescription().getVersion().replace(".", ""));
         if (version < 109) {//如果为1.0.8或更老版本的Mcrmb,就以非静态方法调用
-            payStatic = false;
+            try {
+                this.payApi = Class.forName("com.mcrmb.PayApi").getConstructor().newInstance();
+            } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.payApi = null;
         }
     }
 
-    private boolean payStatic = true;
+    private Object payApi;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -101,13 +108,9 @@ public final class McrmbBuyCommand extends JavaPlugin {
 
     public boolean buy(String player, int money, String reason) {
         try {
-            Class payApi = Class.forName("com.mcrmb.PayApi");
-            Method method = payApi.getMethod("Pay", String.class, String.class, String.class, boolean.class);//反射获取方法
-            if (payStatic) {//使用静态方法调用Mcrmb
-                return (Boolean) method.invoke(null, player, String.valueOf(money), reason, false);
-            } else {//使用非静态调用(老版本Mcrmb)
-                return (Boolean) method.invoke(new com.mcrmb.PayApi(), player, String.valueOf(money), reason, false);
-            }
+            Class payApiClass = Class.forName("com.mcrmb.PayApi");
+            Method method = payApiClass.getMethod("Pay", String.class, String.class, String.class, boolean.class);//反射获取方法
+            return (Boolean) method.invoke(this.payApi, player, String.valueOf(money), reason, false);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
